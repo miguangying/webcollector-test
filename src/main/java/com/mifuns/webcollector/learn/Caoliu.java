@@ -5,12 +5,10 @@ import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
 import org.jsoup.nodes.Document;
 
-import java.io.IOException;
-
 /**
  * Created by miguangying on 2016/12/25.
  */
-public class Demo extends BreadthCrawler{
+public class Caoliu extends BreadthCrawler{
 
     /**
      * @param crawlPath crawlPath is the path of the directory which maintains
@@ -18,14 +16,14 @@ public class Demo extends BreadthCrawler{
      * @param autoParse if autoParse is true,BreadthCrawler will auto extract
      * links which match regex rules from pag
      */
-    public Demo(String crawlPath, boolean autoParse) {
+    public Caoliu(String crawlPath, boolean autoParse) {
         super(crawlPath, autoParse);
         /*种子页面*/
-        this.addSeed("http://www.hnsjb.cn");
+        this.addSeed("http://c6.oj2.biz/thread0806.php?fid=22");
 
         /*正则规则设置*/
         /*爬取符合 http://news.hfut.edu.cn/show-xxxxxxhtml的URL*/
-        this.addRegex("http://www.hnsjb.cn/content/.*html");
+        this.addRegex("http://c6.oj2.biz/htm_data/.*html");
         /*不要爬取 jpg|png|gif*/
         this.addRegex("-.*\\.(jpg|png|gif).*");
         /*不要爬取包含 # 的URL*/
@@ -37,17 +35,13 @@ public class Demo extends BreadthCrawler{
         String url = page.getUrl();
         //System.out.println(url);
         /*判断是否为新闻页，通过正则可以轻松判断*/
-        if (page.matchUrl("http://www.hnsjb.cn/content/.*html")) {
+        if (page.matchUrl("http://c6.oj2.biz/htm_data/.*html")) {
             /*we use jsoup to parse page*/
             Document doc = page.getDoc();
-
             /*extract title and content of news by css selector*/
-            String title = page.select("h1[id=content-title]").text();
-            String content = page.select("div[class=content-content]").text();
-
+            String title = page.select("h4").text();
             System.out.println("URL:\n" + url);
             System.out.println("title:\n" + title);
-            System.out.println("content:\n" + content);
 
             /*如果你想添加新的爬取任务，可以向next中添加爬取任务，
                这就是上文中提到的手动解析*/
@@ -62,7 +56,7 @@ public class Demo extends BreadthCrawler{
 
 
     public static void main(String[] args) throws Exception {
-        Demo crawler = new Demo("crawl", true);
+        Caoliu crawler = new Caoliu("crawl", true);
         /*线程数*/
         crawler.setThreads(50);
         /*设置每次迭代中爬取数量的上限*/
@@ -77,6 +71,12 @@ public class Demo extends BreadthCrawler{
         /*开始深度为4的爬取，这里深度和网站的拓扑结构没有任何关系
             可以将深度理解为迭代次数，往往迭代次数越多，爬取的数据越多*/
         crawler.start(8);
+    }
+
+
+    class Scc{
+        private String title;
+
     }
 
 }

@@ -4,13 +4,13 @@ import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
 import org.jsoup.nodes.Document;
-
-import java.io.IOException;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * Created by miguangying on 2016/12/25.
  */
-public class Demo extends BreadthCrawler{
+public class Meituan extends BreadthCrawler{
 
     /**
      * @param crawlPath crawlPath is the path of the directory which maintains
@@ -18,14 +18,14 @@ public class Demo extends BreadthCrawler{
      * @param autoParse if autoParse is true,BreadthCrawler will auto extract
      * links which match regex rules from pag
      */
-    public Demo(String crawlPath, boolean autoParse) {
+    public Meituan(String crawlPath, boolean autoParse) {
         super(crawlPath, autoParse);
         /*种子页面*/
-        this.addSeed("http://www.hnsjb.cn");
+        this.addSeed("http://waimai.meituan.com/home/wx4gdbnswb58");
 
         /*正则规则设置*/
         /*爬取符合 http://news.hfut.edu.cn/show-xxxxxxhtml的URL*/
-        this.addRegex("http://www.hnsjb.cn/content/.*html");
+        this.addRegex("http://waimai.meituan.com/restaurant/.*");
         /*不要爬取 jpg|png|gif*/
         this.addRegex("-.*\\.(jpg|png|gif).*");
         /*不要爬取包含 # 的URL*/
@@ -37,17 +37,25 @@ public class Demo extends BreadthCrawler{
         String url = page.getUrl();
         //System.out.println(url);
         /*判断是否为新闻页，通过正则可以轻松判断*/
-        if (page.matchUrl("http://www.hnsjb.cn/content/.*html")) {
+        if (page.matchUrl("http://waimai.meituan.com/restaurant/.*")) {
             /*we use jsoup to parse page*/
             Document doc = page.getDoc();
 
             /*extract title and content of news by css selector*/
-            String title = page.select("h1[id=content-title]").text();
-            String content = page.select("div[class=content-content]").text();
+            String title = page.select("div[class=na]>a>span").text();
+            Elements elements = page.select("div[class=j-pic-food pic-food]");
+            System.out.println("店家:" + title);
+            System.out.println("地址:" + url);
+            for (Element element: elements) {
+                String caiming= element.select("span[class=name fl]").text();
+                System.out.println("菜名："+caiming);
+                String danjia =element.select("div[class=only]").text();
+                System.out.println("价格："+danjia);
+                String yueshou =element.select("span[class=sold-count ct-lightgrey]>span").text();
+                System.out.println("月售："+yueshou);
+            }
 
-            System.out.println("URL:\n" + url);
-            System.out.println("title:\n" + title);
-            System.out.println("content:\n" + content);
+
 
             /*如果你想添加新的爬取任务，可以向next中添加爬取任务，
                这就是上文中提到的手动解析*/
@@ -62,7 +70,7 @@ public class Demo extends BreadthCrawler{
 
 
     public static void main(String[] args) throws Exception {
-        Demo crawler = new Demo("crawl", true);
+        Meituan crawler = new Meituan("crawl", true);
         /*线程数*/
         crawler.setThreads(50);
         /*设置每次迭代中爬取数量的上限*/
